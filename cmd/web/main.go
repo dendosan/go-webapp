@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go-webapp/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,19 +15,30 @@ const port = ":4000"
 type application struct {
 	templateCache map[string]*template.Template
 	config        appConfig
+	Models        models.Models
 }
 
 type appConfig struct {
 	useCache bool
+	dsn      string
 }
 
 func main() {
 	app := application{
-	    templateCache: make(map[string]*template.Template),
+		templateCache: make(map[string]*template.Template),
 	}
 
 	flag.BoolVar(&app.config.useCache, "cache", false, "Use template cache")
+	flag.StringVar(&app.config.dsn, "dns", "mariadb:myverysecretpassword@tcp(localhost:3306)/breeders?parseTime=true&tls=false&collation=utf8_unicode_ci&timeout=5s", "DSN")
 	flag.Parse()
+
+	// get database
+	dbPool, err := initMySQLDb(app.config.dsn)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	app.Models = *models.New(dbPool)
 
 	srv := &http.Server{
 		Addr:              port,
@@ -39,7 +51,7 @@ func main() {
 
 	fmt.Println("Starting web application on port", port)
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
