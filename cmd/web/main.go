@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-webapp/models"
+	"go-webapp/configuration"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,7 +15,7 @@ const port = ":4000"
 type application struct {
 	templateCache map[string]*template.Template
 	config        appConfig
-	Models        models.Models
+	App           *configuration.Application
 }
 
 type appConfig struct {
@@ -38,7 +38,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	app.Models = *models.New(dbPool)
+    app.App = configuration.New(dbPool)
 
 	srv := &http.Server{
 		Addr:              port,
