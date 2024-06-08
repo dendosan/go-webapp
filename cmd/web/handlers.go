@@ -69,7 +69,7 @@ func (app *application) CreateCatFromAbstractFactory (w http.ResponseWriter, r *
 }
 
 func (app *application) GetAllDogBreedsJSON(w http.ResponseWriter, r *http.Request) {
-    dogBreeds, err := app.Models.DogBreed.All()
+    dogBreeds, err := app.App.Models.DogBreed.All()
     var t toolbox.Tools
 
     if err != nil {
