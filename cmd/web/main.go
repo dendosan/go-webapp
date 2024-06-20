@@ -16,6 +16,7 @@ type application struct {
 	templateCache map[string]*template.Template
 	config        appConfig
 	App           *configuration.Application
+	catService    *RemoteService
 }
 
 type appConfig struct {
@@ -38,7 +39,11 @@ func main() {
 		log.Panic(err)
 	}
 
-    app.App = configuration.New(dbPool)
+	jsonBackend := &JSONBackend{}
+	jsonAdapter := &RemoteService{Remote: jsonBackend}
+
+	app.App = configuration.New(dbPool)
+	app.catService = jsonAdapter
 
 	srv := &http.Server{
 		Addr:              port,
